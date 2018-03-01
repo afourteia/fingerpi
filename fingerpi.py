@@ -1,17 +1,17 @@
 
-"""Communication with the Fingerprint Scanner using R-Pi"""
+"""Communication with the Fingerprint Scanner using R-Pi through an FTDI Board"""
 
 import os, sys
 import serial
 
-from .base import *
+from base import *
 
 class FingerPi():
     def __init__(self,
-                 port = '/dev/ttyAMA0',
+                 port = '/dev/ttyUSB0',
                  baudrate = 9600,
                  device_id = 0x01,
-                 timeout = 2,
+                 timeout = 5,
                  *args, **kwargs):
         self.port = port
         self.baudrate = baudrate
@@ -23,7 +23,7 @@ class FingerPi():
             *args, **kwargs)
 
         self.device_id = device_id
-        self.timeout = 5
+        self.timeout = timeout
 
         self.save = False
 
