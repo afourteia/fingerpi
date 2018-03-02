@@ -1,17 +1,17 @@
 
 """Communication with the Fingerprint Scanner using R-Pi through an FTDI Board"""
 
-import os, sys
+import os
 import serial
 
-from base import *
+from .base import *
 
 class FingerPi():
     def __init__(self,
-                 port = '/dev/ttyUSB0',
+                 port = '/dev/ttyUSB1',
                  baudrate = 9600,
                  device_id = 0x01,
-                 timeout = 5,
+                 timeout = 2,
                  *args, **kwargs):
         self.port = port
         self.baudrate = baudrate
@@ -23,14 +23,14 @@ class FingerPi():
             *args, **kwargs)
 
         self.device_id = device_id
-        self.timeout = timeout
+        self.timeout = 5
 
         self.save = False
 
         self.serial.flushInput()
         self.serial.flushOutput()
 
-    
+
     ##########################################################
     ## Send/Get routines
 
@@ -46,7 +46,9 @@ class FingerPi():
 
     def getResponse(self, response_len = 12):
         response = self.serial.read(response_len)
-        # print len(response)
+        print(len(response))
+
+
         return decode_command_packet(bytearray(response))
 
     def sendData(self, data, data_len):
@@ -73,13 +75,13 @@ class FingerPi():
                     self.serial.baudrate = baudrate
                     if not self.sendCommand('Open', extra_info):
                         raise RuntimeError("Couldn't send 'Open' packet!")
-                    # print baudrate
+                    print(baudrate)
                     response = self.getResponse()
                     if response['ACK']:
                         # Decoded something
                         response['Parameter'] = baudrate
                         break
-                    
+
             if self.serial.baudrate > 115200: # Cannot be more than that
                 raise RuntimeError("Couldn't find appropriate baud rate!")
         else:
@@ -93,13 +95,14 @@ class FingerPi():
 
     def Close (self):
         self.ChangeBaudrate(9600)
+        self.CmosLed(False)
         if self.sendCommand('Close'):
             response = self.getResponse()
             self.serial.flushInput()
             self.serial.flushOutput()
             self.serial.close()
             return [response, None]
-        
+
         else:
             raise RuntimeError("Couldn't send packet")
 
@@ -306,4 +309,3 @@ class FingerPi():
             return [self.getResponse(), None]
         else:
             raise RuntimeError("Couldn't send packet")
-

@@ -1,6 +1,6 @@
 import struct
 
-from structure import *
+from .structure import *
 
 """
 Command Packet:
@@ -83,7 +83,7 @@ def decode_command_packet(packet):
         'Parameter': None,
         'Checksum': None        
     }
-    _debug = packet
+    debug = packet
     if packet == '': # Nothing to decode
         response['ACK'] = False
         return response
